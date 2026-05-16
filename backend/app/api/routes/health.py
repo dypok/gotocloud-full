@@ -14,9 +14,6 @@ def health_check(
     redis_service: RedisService = Depends(get_redis_service),
     azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
 ):
-    redis_ok = False
-    azure_ok = False
-
     try:
         redis_ok = redis_service.ping()
     except Exception:
@@ -27,7 +24,7 @@ def health_check(
     except Exception:
         azure_ok = False
 
-    overall_status = "ok" if redis_ok else "degraded"
+    overall_status = "ok" if redis_ok and azure_ok else "degraded"
 
     return HealthResponse(
         status=overall_status,

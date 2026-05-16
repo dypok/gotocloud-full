@@ -1,43 +1,41 @@
 from openai import AzureOpenAI
 
+from app.core.config import settings
+
 
 class AzureOpenAIService:
-    def __init__(
-        self,
-        endpoint: str,
-        api_key: str,
-        deployment_gpt4o: str,
-        deployment_mini: str,
-        embeddings_deployment: str,
-        api_version: str = "2024-02-01",
-    ):
-        self.deployment_gpt4o = deployment_gpt4o
-        self.deployment_mini = deployment_mini
-        self.embeddings_deployment = embeddings_deployment
-
+    def __init__(self):
         self.client = AzureOpenAI(
-            api_key=api_key,
-            azure_endpoint=endpoint,
-            api_version=api_version,
+            azure_endpoint=settings.azure_openai_endpoint,
+            api_key=settings.azure_openai_api_key,
+            api_version=settings.azure_openai_api_version,
         )
 
     def healthcheck(self) -> bool:
-        return bool(self.client)
-
-    def chat_completion(
-        self,
-        messages: list[dict],
-        model: str = "gpt4o",
-        temperature: float = 0.2,
-        max_tokens: int = 300,
-    ) -> str:
-        deployment = self.deployment_gpt4o if model == "gpt4o" else self.deployment_mini
-
         response = self.client.chat.completions.create(
-            model=deployment,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
+            model=settings.azure_openai_deployment_gpt4o,
+            messages=[
+                {"role": "system", "content": "You are a healthcheck assistant."},
+                {"role": "user", "content": "Reply with: ok"},
+            ],
+            max_tokens=5,
+            temperature=0,
         )
+        content = response.choices[0].message.content or ""
+        return "ok" in content.lower()
 
-        return response.choices[0].message.content or ""
+    def chat(self, messages: list[dict]) -> str:
+        response = self.client.chat.completions.create(
+            model=settings.azure_openai_deployment_gpt4o,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=500,
+        )
+        return response.choices[0].message.content or "I’m here to help."
+
+    def embed_text(self, text: str) -> list[float]:
+        response = self.client.embeddings.create(
+            model=settings.azure_openai_embeddings,
+            input=text,
+        )
+        return response.data[0].embedding
