@@ -1,122 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, MessageSquare, Home } from 'lucide-react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import LandingPage from './pages/LandingPage';
+import CustomerPortal from './pages/CustomerPortal';
+import InternalDashboard from './pages/InternalDashboard';
+
+const DemoNavigation = () => {
+  const location = useLocation();
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 p-1.5 rounded-full shadow-2xl flex items-center gap-2">
+      <Link
+        to="/"
+        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${location.pathname === '/'
+          ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+          }`}
+      >
+        <Home size={16} />
+        Inicio
+      </Link>
 
-      <div className="ticks"></div>
+      <Link
+        to="/chat"
+        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${location.pathname === '/chat'
+          ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+          }`}
+      >
+        <MessageSquare size={16} />
+        Portal Cliente
+      </Link>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <Link
+        to="/dashboard"
+        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${location.pathname === '/dashboard'
+          ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+          }`}
+      >
+        <LayoutDashboard size={16} />
+        Intelligence Center
+      </Link>
+    </div>
+  );
+};
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+export default function App() {
+  return (
+    <Router>
+      <div className="relative min-h-screen bg-zinc-950 font-sans text-slate-800">
+
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/chat" element={<CustomerPortal />} />
+          <Route path="/dashboard" element={<InternalDashboard />} />
+        </Routes>
+
+      </div>
+    </Router>
+  );
 }
-
-export default App
