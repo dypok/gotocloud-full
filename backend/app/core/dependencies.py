@@ -1,22 +1,27 @@
-from fastapi import Request
+from functools import lru_cache
 
-from backend.app.core.config import AppSettings, get_settings as get_app_settings
-from backend.app.services.azure_openai import AzureOpenAIService
-from backend.app.services.gemini_service import GeminiService
-from backend.app.services.redis_service import RedisService
-
-
-def get_settings() -> AppSettings:
-    return get_app_settings()
+from app.core.config import settings
+from app.services.azure_openai import AzureOpenAIService
+from app.services.redis_service import RedisService
 
 
-def get_azure_openai_service(request: Request) -> AzureOpenAIService:
-    return request.app.state.azure_openai
+@lru_cache
+def get_settings():
+    return settings
 
 
-def get_redis_service(request: Request) -> RedisService:
-    return request.app.state.redis
+@lru_cache
+def get_redis_service() -> RedisService:
+    return RedisService(redis_url=settings.redis_url)
 
 
-def get_gemini_service(request: Request) -> GeminiService:
-    return request.app.state.gemini
+@lru_cache
+def get_azure_openai_service() -> AzureOpenAIService:
+    return AzureOpenAIService(
+        endpoint=settings.azure_openai_endpoint,
+        api_key=settings.azure_openai_api_key,
+        deployment_gpt4o=settings.azure_openai_deployment_gpt4o,
+        deployment_mini=settings.azure_openai_deployment_mini,
+        embeddings_deployment=settings.azure_openai_embeddings,
+    )
+
