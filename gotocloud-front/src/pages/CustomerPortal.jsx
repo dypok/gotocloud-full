@@ -11,78 +11,78 @@ import esCountryNames from 'react-phone-number-input/locale/es.json';
 
 // --- DICCIONARIO DE TRADUCCIÓN NATURAL (SaaS / Enterprise) ---
 const TRANSLATIONS = {
-  es: {
-    titleRegister: "Validación de Sesión",
-    descRegister: "Asociaremos tu consulta a tu número para mantener el historial si decides continuar por llamada o WhatsApp.",
-    labelPhone: "Número móvil",
-    btnRegister: "Iniciar Asistencia",
-    placeholderPhone: "300 123 4567",
-    
-    channelWeb: "Soporte Web",
-    azureActive: "Nodo Azure Operativo",
-    aiBanner: "🛡️ Comunicación protegida por el Agente Autónomo de GoToCloud",
-    placeholderChat: "Escribe tu consulta aquí...",
-    
-    btnVoice: "Llamada de Voz",
-    btnWhatsApp: "Continuar en WhatsApp",
-    
-    callConnecting: "CONECTANDO VÍA ACS...",
-    callActive: "LLAMADA EN CURSO",
-    callConnectingDesc: "Enlazando con tu dispositivo...",
-    callActiveDesc: "Procesamiento de voz activo mediante Azure AI",
-    
-    wsSuccess: "Transición exitosa. Revisa tu WhatsApp para continuar.",
-    welcomeNew: "Hola, te doy la bienvenida a GoToCloud. Soy tu agente de Inteligencia Artificial. ¿En qué te puedo asesorar hoy sobre nuestra infraestructura cloud?",
-    welcomeReturning: "¡Qué bueno verte de nuevo! He recuperado nuestro contexto anterior. ¿En qué más te puedo ayudar hoy con tu entorno Azure?"
-  },
-  pt: {
-    titleRegister: "Validação de Sessão",
-    descRegister: "Vamos associar seu atendimento ao seu número para manter o histórico caso decida continuar por telefone ou WhatsApp.",
-    labelPhone: "Número de celular",
-    btnRegister: "Iniciar Atendimento",
-    placeholderPhone: "(11) 91234-5678",
-    
-    channelWeb: "Suporte Web",
-    azureActive: "Nodo Azure Operacional",
-    aiBanner: "🛡️ Comunicação protegida pelo Agente Autônomo da GoToCloud",
-    placeholderChat: "Digite sua dúvida aqui...",
-    
-    btnVoice: "Chamada de Voz",
-    btnWhatsApp: "Continuar no WhatsApp",
-    
-    callConnecting: "CONECTANDO VIA ACS...",
-    callActive: "CHAMADA EM ANDAMENTO",
-    callConnectingDesc: "Conectando ao seu dispositivo...",
-    callActiveDesc: "Processamento de voz ativo via Azure AI",
-    
-    wsSuccess: "Transição concluída. Verifique seu WhatsApp para continuar.",
-    welcomeNew: "Olá, boas-vindas à GoToCloud. Sou seu agente de Inteligência Artificial. Como posso te apoiar hoje com nossa infraestrutura em nuvem?",
-    welcomeReturning: "Que bom te ver de novo! Recuperei o nosso contexto anterior. Como mais posso te ajudar hoje com seu ambiente Azure?"
-  },
-  en: {
-    titleRegister: "Session Validation",
-    descRegister: "We will link your inquiry to your number to maintain the history if you decide to switch to a call or WhatsApp.",
-    labelPhone: "Mobile number",
-    btnRegister: "Start Assistance",
-    placeholderPhone: "202-555-0143",
-    
-    channelWeb: "Web Support",
-    azureActive: "Azure Node Operational",
-    aiBanner: "🛡️ Communication secured by GoToCloud's Autonomous Agent",
-    placeholderChat: "Type your question here...",
-    
-    btnVoice: "Voice Call",
-    btnWhatsApp: "Continue on WhatsApp",
-    
-    callConnecting: "CONNECTING VIA ACS...",
-    callActive: "CALL IN PROGRESS",
-    callConnectingDesc: "Linking to your device...",
-    callActiveDesc: "Voice processing active via Azure AI",
-    
-    wsSuccess: "Transition successful. Check your WhatsApp to continue.",
-    welcomeNew: "Hello, welcome to GoToCloud. I'm your AI agent. How can I assist you today with our cloud infrastructure?",
-    welcomeReturning: "Great to see you again! I've recovered our previous context. How else can I help you today with your Azure environment?"
-  }
+    es: {
+        titleRegister: "Validación de Sesión",
+        descRegister: "Asociaremos tu consulta a tu número para mantener el historial si decides continuar por llamada o WhatsApp.",
+        labelPhone: "Número móvil",
+        btnRegister: "Iniciar Asistencia",
+        placeholderPhone: "300 123 4567",
+
+        channelWeb: "Soporte Web",
+        azureActive: "Nodo Azure Operativo",
+        aiBanner: "🛡️ Comunicación protegida por el Agente Autónomo de GoToCloud",
+        placeholderChat: "Escribe tu consulta aquí...",
+
+        btnVoice: "Llamada de Voz",
+        btnWhatsApp: "Continuar en WhatsApp",
+
+        callConnecting: "CONECTANDO VÍA ACS...",
+        callActive: "LLAMADA EN CURSO",
+        callConnectingDesc: "Enlazando con tu dispositivo...",
+        callActiveDesc: "Procesamiento de voz activo mediante Azure AI",
+
+        wsSuccess: "Transición exitosa. Revisa tu WhatsApp para continuar.",
+        welcomeNew: "Hola, te doy la bienvenida a GoToCloud. Soy tu agente de Inteligencia Artificial. ¿En qué te puedo asesorar hoy sobre nuestra infraestructura cloud?",
+        welcomeReturning: "¡Qué bueno verte de nuevo! He recuperado nuestro contexto anterior. ¿En qué más te puedo ayudar hoy con tu entorno Azure?"
+    },
+    pt: {
+        titleRegister: "Validação de Sessão",
+        descRegister: "Vamos associar seu atendimento ao seu número para manter o histórico caso decida continuar por telefone ou WhatsApp.",
+        labelPhone: "Número de celular",
+        btnRegister: "Iniciar Atendimento",
+        placeholderPhone: "(11) 91234-5678",
+
+        channelWeb: "Suporte Web",
+        azureActive: "Nodo Azure Operacional",
+        aiBanner: "🛡️ Comunicação protegida pelo Agente Autônomo da GoToCloud",
+        placeholderChat: "Digite sua dúvida aqui...",
+
+        btnVoice: "Chamada de Voz",
+        btnWhatsApp: "Continuar no WhatsApp",
+
+        callConnecting: "CONECTANDO VIA ACS...",
+        callActive: "CHAMADA EM ANDAMENTO",
+        callConnectingDesc: "Conectando ao seu dispositivo...",
+        callActiveDesc: "Processamento de voz ativo via Azure AI",
+
+        wsSuccess: "Transição concluída. Verifique seu WhatsApp para continuar.",
+        welcomeNew: "Olá, boas-vindas à GoToCloud. Sou seu agente de Inteligência Artificial. Como posso te apoiar hoje com nossa infraestrutura em nuvem?",
+        welcomeReturning: "Que bom te ver de novo! Recuperei o nosso contexto anterior. Como mais posso te ajudar hoje com seu ambiente Azure?"
+    },
+    en: {
+        titleRegister: "Session Validation",
+        descRegister: "We will link your inquiry to your number to maintain the history if you decide to switch to a call or WhatsApp.",
+        labelPhone: "Mobile number",
+        btnRegister: "Start Assistance",
+        placeholderPhone: "202-555-0143",
+
+        channelWeb: "Web Support",
+        azureActive: "Azure Node Operational",
+        aiBanner: "🛡️ Communication secured by GoToCloud's Autonomous Agent",
+        placeholderChat: "Type your question here...",
+
+        btnVoice: "Voice Call",
+        btnWhatsApp: "Continue on WhatsApp",
+
+        callConnecting: "CONNECTING VIA ACS...",
+        callActive: "CALL IN PROGRESS",
+        callConnectingDesc: "Linking to your device...",
+        callActiveDesc: "Voice processing active via Azure AI",
+
+        wsSuccess: "Transition successful. Check your WhatsApp to continue.",
+        welcomeNew: "Hello, welcome to GoToCloud. I'm your AI agent. How can I assist you today with our cloud infrastructure?",
+        welcomeReturning: "Great to see you again! I've recovered our previous context. How else can I help you today with your Azure environment?"
+    }
 };
 
 export default function CustomerPortal() {
