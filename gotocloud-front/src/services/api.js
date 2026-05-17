@@ -1,27 +1,27 @@
-// src/services/api.js
-// Servicio central de comunicación con el backend GoToCloud para el portal público.
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = 'http://127.0.0.1:8000';
 
 export const chatService = {
-  sendMessage: async (sessionId, message, channel = 'webchat') => {
-    const payload = {
-      session_id: sessionId,
-      message,
-      channel,
-    };
-
-    const res = await fetch(`${API_BASE_URL}/chat`, {
+  // Conectar el CustomerPortal al chat_router real
+  sendMessage: async (sessionId, message, phoneNumber) => {
+    const response = await fetch(`${API_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ session_id: sessionId, message, phone_number: phoneNumber })
     });
+    return response.json();
+  }
+};
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Chat request failed: ${res.status} ${errorText}`);
-    }
-
-    return res.json();
-  },
+export const adminService = {
+  // Conectar el InternalDashboard a los datos reales
+  getDashboardMetrics: async () => {
+    const token = localStorage.getItem('auth_token'); // Sacamos el token guardado
+    const response = await fetch(`${API_URL}/admin/metrics`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // <- Esto es lo que lee la librería 'jose'
+      }
+    });
+    return response.json();
+  }
 };

@@ -53,16 +53,25 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email.trim() || !password.trim()) return;
-
         setIsLoading(true);
-
         try {
-            await authService.login(email, password);
-            navigate('/dashboard');
+            // Asumiendo que tu compa hizo la ruta en /api/admin/login
+            const response = await fetch('http://127.0.0.1:8000/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Guardamos el token REAL que nos da el backend
+                localStorage.setItem('auth_token', data.access_token);
+                navigate('/dashboard');
+            } else {
+                alert("Credenciales incorrectas");
+            }
         } catch (error) {
-            console.error(error);
-            alert(error.message || 'Error al autenticar');
+            console.error("Error conectando al back:", error);
         } finally {
             setIsLoading(false);
         }
