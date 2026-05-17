@@ -1,34 +1,42 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const chatService = {
-    sendMessage: async (sessionId, message, channel = 'web_chat') => {
+    sendMessage: async (sessionId, message, channel = 'webchat') => {
+        const payload = {
+            session_id: sessionId,
+            message,
+            channel,
+        };
+
         const res = await fetch(`${API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                session_id: sessionId,
-                message,
-                channel
-            })
+            body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Error del servidor');
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Chat request failed: ${res.status} ${errorText}`);
+        }
+
         return res.json();
-    }
+    },
 };
 
 export const dashboardService = {
     getMetrics: async () => {
-        const res = await fetch(`${API_BASE_URL}/dashboard/metrics`);
-        if (!res.ok) throw new Error('Error obteniendo métricas');
-        return res.json();
+        return new Promise((resolve) => {
+            setTimeout(() => resolve({
+                kpis: { active_incidents: 12, sla_risk: 1, sentiment: "Positivo", leads: 4 }
+            }), 500);
+        });
     },
     queryIntelligenceAgent: async (query) => {
-        const res = await fetch(`${API_BASE_URL}/intelligence/query`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query })
+        return new Promise((resolve) => {
+            setTimeout(() => resolve({
+                answer: `(Simulado) Tras analizar la BD, encontré esto respecto a "${query}".`,
+                type: 'general'
+            }), 1500);
         });
-        if (!res.ok) throw new Error('Error consultando agente');
-        return res.json();
     }
 };
