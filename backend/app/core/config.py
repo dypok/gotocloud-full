@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     app_name: str = "GoToCloud AI Contact Center Backend"
     app_env: str = "development"
 
+    
+    postgres_url: str = Field(alias="POSTGRES_URL")
+    
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     redis_context_ttl_minutes: int = Field(default=60, alias="REDIS_CONTEXT_TTL_MINUTES")
     session_ttl_hours: int = Field(default=24, alias="SESSION_TTL_HOURS")
