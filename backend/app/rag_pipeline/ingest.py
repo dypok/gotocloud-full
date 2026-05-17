@@ -1,60 +1,104 @@
+"""
+GoToCloud RAG Pipeline — ingest.py corregido
+Lee rag_knowledge_base.json, genera embeddings y los sube a PostgreSQL.
+Correr desde la carpeta backend/:
+    python app/rag_pipeline/ingest.py
+"""
 import sys
 import os
 import json
+
+# Agregar la raíz del backend al path para que encuentre 'app'
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from sqlmodel import Session, create_engine
+from app.core.config import settings
+from app.models.schemas import VectorDocument
+from app.services.azure_openai import AzureOpenAIService
 
-# Truco de rutas adaptado a la nueva ubicación en backend/app/rag_pipeline
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.config_db import settings  # Tu archivo personalizado de configuración
-from models.schemas import VectorDocument
-from services.azure_openai import AzureOpenAIService
+# Path al JSON generado por el scraper
+JSON_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'web_scrap', 'rag_knowledge_base.json')
 
-engine = create_engine(settings.POSTGRES_URL)
+
+def load_knowledge_base(path: str) -> list[dict]:
+    """Carga el JSON generado por el scraper."""
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    print(f"   📚 {len(data)} fragmentos cargados desde el JSON.")
+    return data
+
 
 def main():
-    ruta_json = "web_scrap/rag_knowledge_base.json"
-    
-    if not os.path.exists(ruta_json):
-        print(f"❌ Error: No se encontró el archivo {ruta_json}.")
-        return
+    print("🚀 Iniciando pipeline RAG — GoToCloud Knowledge Base")
 
-    print("📂 1. Leyendo el conocimiento estructurado del JSON...")
-    with open(ruta_json, "r", encoding="utf-8") as f:
-        knowledge_base = json.load(f)
-        
-    print(f"   ¡Se encontraron {len(knowledge_base)} fragmentos listos para procesar!")
+    # 1. Cargar el JSON del scraper
+    print("\n📂 1. Cargando rag_knowledge_base.json...")
+    try:
+        documents = load_knowledge_base(JSON_PATH)
+    except FileNotFoundError:
+        print(f"❌ No se encontró el archivo en: {JSON_PATH}")
+        print("   Asegúrate de haber corrido primero: python web_scrap/scraper.py")
+        sys.exit(1)
 
-    print("🧠 2. Inicializando conexión con Azure OpenAI...")
-    # Llamamos al constructor vacío tal como lo diseñó tu equipo
+    # 2. Inicializar servicios
+    print("\n🧠 2. Inicializando AzureOpenAI...")
     ai_service = AzureOpenAIService()
+    engine = create_engine(settings.postgres_url)
 
-    print("💾 3. Generando embeddings REALES y guardando en PostgreSQL...")
+    # 3. Generar embeddings y guardar
+    print(f"\n💾 3. Generando embeddings y guardando {len(documents)} fragmentos en PostgreSQL...")
+    
+    success = 0
+    errors = 0
+
     with Session(engine) as db_session:
-        db_session.query(VectorDocument).delete()
-        
-        for i, item in enumerate(knowledge_base):
-            content = item["content"]
-            metadata = item["metadata"]
-            
-            # --- CONEXIÓN REAL A LA IA ---
-            vector = ai_service.embed_text(content)
-            
-            if vector:
+        for i, doc in enumerate(documents):
+            content = doc.get("content", "").strip()
+            metadata = doc.get("metadata", {})
+
+            if not content or len(content) < 50:
+                print(f"   ⚠️  Chunk {i+1} muy corto, omitiendo.")
+                errors += 1
+                continue
+
+            print(f"   [{i+1}/{len(documents)}] Embedding: {metadata.get('source', '?')[:60]} — chunk {metadata.get('chunk_index', i)}")
+
+            try:
+                vector = ai_service.embed_text(content)
+
+                if not vector:
+                    print(f"   ⚠️  Embedding vacío para chunk {i+1}, omitiendo.")
+                    errors += 1
+                    continue
+
                 nuevo_doc = VectorDocument(
                     content=content,
                     metadata_doc=metadata,
-                    embedding=vector 
+                    embedding=vector
                 )
                 db_session.add(nuevo_doc)
-            else:
-                print(f"   ⚠️ Falló la generación del vector para el fragmento {i}")
-            
-            if (i + 1) % 10 == 0:
-                print(f"   ... procesados {i + 1}/{len(knowledge_base)} fragmentos")
-        
+
+                # Commit cada 10 documentos para no perder todo si hay error
+                if (i + 1) % 10 == 0:
+                    db_session.commit()
+                    print(f"   ✅ Commit parcial — {i+1} documentos guardados.")
+
+                success += 1
+
+            except Exception as e:
+                print(f"   ❌ Error en chunk {i+1}: {e}")
+                errors += 1
+                continue
+
+        # Commit final
         db_session.commit()
-        print("\n✅ ¡FASE 2 COMPLETADA! Toda la base de conocimiento está en tu PostgreSQL con vectores reales.")
+
+    print(f"\n🎉 Pipeline completado.")
+    print(f"   ✅ Exitosos: {success}")
+    print(f"   ⚠️  Errores:  {errors}")
+    print(f"   📊 Total procesados: {success + errors}/{len(documents)}")
+
 
 if __name__ == "__main__":
     main()
