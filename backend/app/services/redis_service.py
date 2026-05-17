@@ -1,8 +1,20 @@
 import json
 from typing import Any
+from uuid import UUID
+from datetime import datetime
 
 import redis
 from redis.exceptions import ConnectionError as RedisConnectionError
+
+
+class JSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder que maneja UUID y datetime."""
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 class RedisService:
@@ -37,7 +49,7 @@ class RedisService:
         ttl_seconds: int | None = None,
     ) -> bool:
         try:
-            payload = json.dumps(value)
+            payload = json.dumps(value, cls=JSONEncoder)
             return bool(self.client.set(name=key, value=payload, ex=ttl_seconds))
         except RedisConnectionError:
             return False
