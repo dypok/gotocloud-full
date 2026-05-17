@@ -5,6 +5,7 @@ import { Cpu, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 // --- IMPORTAMOS EL CONTEXTO Y EL COMPONENTE SELECTOR ---
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
+import { authService } from '../services/adminApi';
 
 // --- DICCIONARIO DE TRADUCCIÓN ---
 const TRANSLATIONS = {
@@ -50,18 +51,21 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         if (!email.trim() || !password.trim()) return;
 
         setIsLoading(true);
 
-        // Simular validación con el backend (FastAPI + JWT) por 1.5 segundos
-        setTimeout(() => {
-            setIsLoading(false);
-            localStorage.setItem('auth_token', 'mock-jwt-token-12345');
+        try {
+            await authService.login(email, password);
             navigate('/dashboard');
-        }, 1500);
+        } catch (error) {
+            console.error(error);
+            alert(error.message || 'Error al autenticar');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

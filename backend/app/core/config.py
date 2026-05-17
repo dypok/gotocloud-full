@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     session_ttl_hours: int = Field(default=24, alias="SESSION_TTL_HOURS")
     redis_context_ttl_minutes: int = Field(default=60, alias="REDIS_CONTEXT_TTL_MINUTES")
 
+    admin_email: str = Field(default="admin@gotocloud.ai", alias="ADMIN_EMAIL")
+    admin_password: str = Field(default="gotocloud2024", alias="ADMIN_PASSWORD")
+    admin_name: str = Field(default="GoToCloud Admin", alias="ADMIN_NAME")
+
+    admin_jwt_secret: str = Field(
+        default="gotocloud-change-me-in-prod-secret-2024",
+        alias="ADMIN_JWT_SECRET",
+    )
+
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         case_sensitive=False,

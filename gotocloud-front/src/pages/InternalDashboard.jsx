@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 
 import { useLanguage } from '../context/LanguageContext';
+import { dashboardService } from '../services/adminApi';
 
 const TRANSLATIONS = {
     es: {
@@ -111,6 +112,8 @@ export default function InternalDashboard() {
     const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const [inputQuery, setInputQuery] = useState('');
     const [queries, setQueries] = useState([]);
+    const [metrics, setMetrics] = useState(null);
+    const [dashboardError, setDashboardError] = useState(null);
 
     const leadIndustries = [
         { name: t.ind1, leads: 45 },
@@ -122,6 +125,17 @@ export default function InternalDashboard() {
     useEffect(() => {
         setQueries([{ id: '1', question: t.initialQ, answer: t.initialA, type: 'operativo' }]);
         const timer = setTimeout(() => setIsLoading(false), 2000);
+
+        const loadDashboardMetrics = async () => {
+            try {
+                const result = await dashboardService.getMetrics();
+                setMetrics(result.kpis || null);
+            } catch (error) {
+                setDashboardError(error.message || 'No se pudieron cargar las métricas');
+            }
+        };
+
+        loadDashboardMetrics();
         return () => clearTimeout(timer);
     }, [lang]);
 
@@ -166,10 +180,10 @@ export default function InternalDashboard() {
                     ))
                 ) : (
                     [
-                        { title: t.kpi1, value: '24', icon: Activity, color: 'text-zinc-300' },
-                        { title: t.kpi2, value: '3', icon: AlertTriangle, color: 'text-red-400' },
-                        { title: t.kpi3, value: t.kpi3Val, icon: TrendingUp, color: 'text-zinc-300' },
-                        { title: t.kpi4, value: '7', icon: Target, color: 'text-orange-500' },
+                        { title: t.kpi1, value: metrics?.active_incidents ?? '24', icon: Activity, color: 'text-zinc-300' },
+                        { title: t.kpi2, value: metrics?.sla_risk ?? '3', icon: AlertTriangle, color: 'text-red-400' },
+                        { title: t.kpi3, value: metrics?.sentiment ?? t.kpi3Val, icon: TrendingUp, color: 'text-zinc-300' },
+                        { title: t.kpi4, value: metrics?.leads ?? '7', icon: Target, color: 'text-orange-500' },
                     ].map((metric, idx) => (
                         <div key={idx} className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 flex items-start justify-between">
                             <div>
