@@ -60,4 +60,4 @@ class VectorDocument(SQLModel, table=True):
     # JSONB nativo de PostgreSQL para metadatos flexibles del scraper
     metadata_doc: dict = Field(default={}, sa_column=Column("metadata", JSON))
     # Dimensión 1536 mapea directo con text-embedding-3-small o text-encoding-ada-002 de Azure
-    embedding: Any = Field(sa_column=Column(Vector(1536)))
+    embedding: Any = Field(sa_column=Column(Vector(3072)))
