@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     azure_openai_endpoint: str = Field(default="", alias="AZURE_OPENAI_ENDPOINT")
     azure_openai_api_key: str = Field(default="", alias="AZURE_OPENAI_API_KEY")
+    azure_openai_api_version: str = Field(default="2024-11-20", alias="AZURE_OPENAI_API_VERSION")
     azure_openai_deployment_gpt4o: str = Field(default="", alias="AZURE_OPENAI_DEPLOYMENT_GPT4O")
     azure_openai_deployment_mini: str = Field(default="", alias="AZURE_OPENAI_DEPLOYMENT_MINI")
     azure_openai_embeddings: str = Field(default="", alias="AZURE_OPENAI_EMBEDDINGS")
