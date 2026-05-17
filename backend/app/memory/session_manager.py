@@ -25,6 +25,12 @@ class SessionManager:
             "priority": "normal",
         }
 
+    def load_context(self, session_id: str | None) -> dict[str, Any] | None:
+        if not session_id:
+            return None
+        key = self.build_context_key(session_id)
+        return self.redis_service.get_json(key)
+
     def get_or_create_context(self, session_id: str | None, channel: str = "webchat") -> dict[str, Any]:
         if not session_id:
             session_id = self.generate_session_id()

@@ -1,14 +1,15 @@
-from pydantic import BaseModel, Field
+from uuid import UUID
+from pydantic import BaseModel
 
 
 class ChatRequest(BaseModel):
-    session_id: str | None = None
-    message: str = Field(..., min_length=1)
+    session_id: UUID | None = None
+    message: str
     channel: str = "webchat"
 
 
 class ChatResponse(BaseModel):
-    session_id: str
+    session_id: UUID
     reply: str
     channel: str
     context_loaded: bool

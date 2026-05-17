@@ -56,4 +56,4 @@ class AzureOpenAIService:
         except Exception as e:
             # Puedes cambiar esto por tu logger.error más adelante si prefieres
             print(f"Error generando embedding en AzureOpenAIService: {e}")
-            return []
+            return [] 
