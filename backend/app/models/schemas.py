@@ -74,7 +74,7 @@ if PGVECTOR_AVAILABLE:
             default_factory=dict,
             sa_column=Column("metadata", JSONB),
         )
-        embedding: Any = Field(sa_column=Column(Vector(1536)))
+        embedding: Any = Field(sa_column=Column(Vector(3072)))
 else:
     class VectorDocument(SQLModel, table=True):
         __tablename__ = "vector_documents"

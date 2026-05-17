@@ -85,7 +85,7 @@ def rebuild_context_from_db(
     last_channel = recent_messages[-1]["channel"] if recent_messages else channel
 
     return {
-        "session_id": session_obj.id,
+        "session_id": str(session_obj.id),
         "active_issue": active_incident,
         "recent_messages": recent_messages,
         "last_channel": last_channel,
@@ -103,7 +103,7 @@ def chat(
 ):
     context_loaded = True
 
-    context = session_manager.load_context(payload.session_id)
+    context = session_manager.load_context(str(payload.session_id) if payload.session_id else None)
 
     if not context:
         context_loaded = False
@@ -119,10 +119,9 @@ def chat(
                 channel=payload.channel,
             )
 
-    session_id = context["session_id"]
-    if isinstance(session_id, str):
-        session_id = UUID(session_id)
-        context["session_id"] = session_id
+    session_id_str = str(context["session_id"])
+    context["session_id"] = session_id_str
+    session_id = UUID(session_id_str)
 
     session_obj = db.get(SessionModel, session_id)
     if not session_obj:
@@ -166,20 +165,8 @@ def chat(
     db.commit()
 
     recent_messages = context.get("recent_messages", [])
-    recent_messages.append(
-        {
-            "role": "user",
-            "message": payload.message,
-            "channel": payload.channel,
-        }
-    )
-    recent_messages.append(
-        {
-            "role": "assistant",
-            "message": reply,
-            "channel": payload.channel,
-        }
-    )
+    recent_messages.append({"role": "user", "message": payload.message, "channel": payload.channel})
+    recent_messages.append({"role": "assistant", "message": reply, "channel": payload.channel})
     context["recent_messages"] = recent_messages[-10:]
 
     context_persisted = session_manager.save_context(context)
