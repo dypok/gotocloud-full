@@ -16,3 +16,5 @@ pgvector
 
 python-jose[cryptography]
 passlib[bcrypt]
+
+python-telegram-bot==13.15

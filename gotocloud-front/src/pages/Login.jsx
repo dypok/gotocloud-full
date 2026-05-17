@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cpu, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Cpu, Mail, Lock, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
 
 // --- IMPORTAMOS EL CONTEXTO Y EL COMPONENTE SELECTOR ---
 import { useLanguage } from '../context/LanguageContext';
@@ -17,7 +17,11 @@ const TRANSLATIONS = {
         passPlaceholder: "••••••••",
         btnLoading: "Autenticando...",
         btnSubmit: "Ingresar al Centro de Comando",
-        footerNote: "Modo Sandbox activo. Se permite el acceso con cualquier credencial para efectos de demostración técnica."
+        btnBack: "Atrás",
+        footerNote: "Modo Sandbox activo. Se permite el acceso con cualquier credencial para efectos de demostración técnica.",
+        errorInvalid: "Credenciales inválidas. Intenta de nuevo.",
+        errorServer: "Error al conectar con el servidor. Intenta más tarde.",
+        errorRequired: "Completa todos los campos."
     },
     pt: {
         subtitle: "Plataforma Omnichannel e Inteligência Artificial",
@@ -27,7 +31,11 @@ const TRANSLATIONS = {
         passPlaceholder: "••••••••",
         btnLoading: "Autenticando...",
         btnSubmit: "Entrar no Centro de Comando",
-        footerNote: "Modo Sandbox ativo. Qualquer credencial é permitida para fins de demonstração técnica."
+        btnBack: "Voltar",
+        footerNote: "Modo Sandbox ativo. Qualquer credencial é permitida para fins de demonstração técnica.",
+        errorInvalid: "Credenciais inválidas. Tenta novamente.",
+        errorServer: "Erro ao conectar com o servidor. Tenta mais tarde.",
+        errorRequired: "Preenche todos os campos."
     },
     en: {
         subtitle: "Omnichannel and Artificial Intelligence Platform",
@@ -37,7 +45,11 @@ const TRANSLATIONS = {
         passPlaceholder: "••••••••",
         btnLoading: "Authenticating...",
         btnSubmit: "Enter Command Center",
-        footerNote: "Sandbox mode active. Access is granted with any credentials for technical demonstration purposes."
+        btnBack: "Back",
+        footerNote: "Sandbox mode active. Access is granted with any credentials for technical demonstration purposes.",
+        errorInvalid: "Invalid credentials. Try again.",
+        errorServer: "Error connecting to server. Try again later.",
+        errorRequired: "Fill in all fields."
     }
 };
 
@@ -49,32 +61,55 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+
+        if (!email.trim() || !password.trim()) {
+            setError(t.errorRequired);
+            return;
+        }
+
         setIsLoading(true);
         try {
-            // Asumiendo que tu compa hizo la ruta en /api/admin/login
+            // OAuth2PasswordRequestForm espera 'username' y 'password' como form-data
+            const formData = new URLSearchParams();
+            formData.append('username', email.trim());
+            formData.append('password', password.trim());
+
             const response = await fetch('http://127.0.0.1:8000/api/admin/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
             });
 
             if (response.ok) {
                 const data = await response.json();
                 // Guardamos el token REAL que nos da el backend
                 localStorage.setItem('auth_token', data.access_token);
+                localStorage.setItem('user_name', data.name);
+                localStorage.setItem('user_role', data.role);
                 navigate('/dashboard');
+            } else if (response.status === 401) {
+                setError(t.errorInvalid);
             } else {
-                alert("Credenciales incorrectas");
+                setError(t.errorServer);
             }
         } catch (error) {
             console.error("Error conectando al back:", error);
+            setError(t.errorServer);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleBackClick = () => {
+        navigate('/');
     };
 
     return (
@@ -84,6 +119,17 @@ export default function Login() {
             <div className="absolute top-4 right-4 z-50">
                 <LanguageSelector />
             </div>
+
+            {/* Botón de Atrás */}
+            <button
+                onClick={handleBackClick}
+                disabled={isLoading}
+                className="absolute top-4 left-4 z-50 p-2 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center gap-2 text-zinc-300 hover:text-zinc-100"
+                title={t.btnBack}
+            >
+                <ChevronLeft size={20} />
+                <span className="text-sm">{t.btnBack}</span>
+            </button>
 
             {/* Efectos de luces de fondo sutiles */}
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -99,6 +145,13 @@ export default function Login() {
                     <h1 className="text-2xl font-bold text-zinc-50">GoToCloud</h1>
                     <p className="text-xs text-zinc-400 mt-1">{t.subtitle}</p>
                 </div>
+
+                {/* Mensaje de Error */}
+                {error && (
+                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                        <p className="text-sm text-red-400">{error}</p>
+                    </div>
+                )}
 
                 {/* Formulario */}
                 <form onSubmit={handleLogin} className="space-y-5">

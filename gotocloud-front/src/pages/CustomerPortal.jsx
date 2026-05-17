@@ -232,6 +232,10 @@ export default function CustomerPortal() {
     }, [sessionId, speakText, speechLang, callPhase]);
 
     const startCall = async () => {
+        // Desbloquear audio context con el click del usuario
+        const unlock = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(unlock);
+        window.speechSynthesis.cancel();
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             alert(t.voiceNotSupported);

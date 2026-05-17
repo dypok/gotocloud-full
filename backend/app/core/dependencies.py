@@ -4,6 +4,7 @@ from fastapi import Depends
 from sqlmodel import Session, create_engine
 
 from app.core.config import settings
+from app.memory.memory_store import MemoryStore
 from app.services.azure_openai import AzureOpenAIService
 from app.services.chat_orchestrator import ChatOrchestrator
 from app.services.redis_service import RedisService
@@ -20,6 +21,12 @@ def get_db():
 @lru_cache
 def get_redis_service() -> RedisService:
     return RedisService(redis_url=settings.redis_url)
+
+
+def get_memory_store(
+    redis_service: RedisService = Depends(get_redis_service),
+) -> MemoryStore:
+    return MemoryStore(redis_service=redis_service)
 
 
 @lru_cache

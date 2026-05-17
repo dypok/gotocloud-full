@@ -4,21 +4,44 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Truco de rutas apuntando solo a la carpeta 'app'
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# 1. Apuntamos a la raíz del proyecto (backend) para alinear las rutas
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-# Importamos con la misma estructura que usa el resto del proyecto
-from rag_pipeline.chat import buscar_contexto, ai_service
-from models.schemas import ChatLog
-from core.config_db import settings
+# 2. Usamos siempre el prefijo 'app.' igual que tus compañeros
+from app.rag_pipeline.chat import buscar_contexto, ai_service
+from app.models.schemas import ChatLog
+from app.core.config import settings
 from sqlmodel import Session, create_engine
 
-# Cargar el Token de forma segura
+# Cargar variables del .env de forma segura
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+DB_URL = os.getenv("POSTGRES_URL")  # <-- Lo leemos directo del .env sin pasar por settings
 
-# Conexión a DB para guardar los logs (Fase 4)
-engine = create_engine(settings.POSTGRES_URL)
+# Conexión a DB para guardar los logs
+engine = create_engine(DB_URL)
+
+def calcular_lead_score(mensaje: str) -> int:
+    """Calcula la intención de compra basada en palabras clave"""
+    mensaje_min = mensaje.lower()
+    
+    # Palabras de cierre / venta (Lead Caliente)
+    keywords_calientes = ["comprar", "precio", "costo", "cotizar", "cotización", "urgente", "contratar", "planes", "pagar"]
+    if any(word in mensaje_min for word in keywords_calientes):
+        return 90
+        
+    # Palabras de exploración (Lead Tibio)
+    keywords_tibios = ["cómo funciona", "beneficios", "diferencia", "arquitectura", "implementar", "servicios", "solución"]
+    if any(word in mensaje_min for word in keywords_tibios):
+        return 50
+        
+    # Saludos / Despedidas (Lead Frío)
+    keywords_frios = ["hola", "gracias", "adiós", "buenos días", "ok", "vale"]
+    if any(word in mensaje_min for word in keywords_frios):
+        return 10
+        
+    # Por defecto (Curioso general)
+    return 20
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Responde cuando el usuario inicia el bot con /start"""
@@ -36,7 +59,7 @@ async def responder_mensaje(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
 
     # 1. Muestra "Escribiendo..." en Telegram (¡Le da un toque muy pro!)
-    await context.bot.send_chat_action(chat_id=chat_id, action='typing')
+   # await context.bot.send_chat_action(chat_id=chat_id, action='typing')
 
     try:
         # 2. Buscar contexto en PostgreSQL (tu RAG)
@@ -61,16 +84,18 @@ async def responder_mensaje(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 5. Enviar la respuesta a Telegram
         await update.message.reply_text(respuesta)
 
-        # 6. (Fase 4) Guardar la interacción en la base de datos
+        # 6. (Fase 4) Guardar la interacción con su Lead Score real
+        score_calculado = calcular_lead_score(pregunta)
+        
         with Session(engine) as db_session:
             nuevo_log = ChatLog(
                 user_message=pregunta,
                 bot_response=respuesta,
-                lead_score=0 
+                lead_score=score_calculado
             )
             db_session.add(nuevo_log)
             db_session.commit()
-            print(f"💾 Log guardado en DB desde Telegram: {update.message.from_user.first_name}")
+            print(f"💾 Guardado en DB | Usuario: {update.message.from_user.first_name} | Score: {score_calculado}")
 
     except Exception as e:
         print(f"❌ Error procesando mensaje de Telegram: {e}")
