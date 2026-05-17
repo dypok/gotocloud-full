@@ -186,8 +186,16 @@ export default function CustomerPortal() {
         setIsLoading(true);
 
         try {
-            const data = await chatService.sendMessage(sessionId, userText, savedGlobalPhone);
-            const agentMsg = { id: Date.now().toString(), role: 'agent', content: data.response };
+            const currentSessionId = sessionId || localStorage.getItem('anon_session_id');
+            const data = await chatService.sendMessage(currentSessionId, userText, 'webchat');
+
+            if (data.session_id) {
+                const returnedSessionId = data.session_id;
+                localStorage.setItem('anon_session_id', returnedSessionId);
+                setSessionId(returnedSessionId);
+            }
+
+            const agentMsg = { id: Date.now().toString(), role: 'agent', content: data.reply };
             setMessages((prev) => [...prev, agentMsg]);
         } catch (error) {
             const errorMsg = { id: Date.now().toString(), role: 'agent', content: "Error de conexión." };
