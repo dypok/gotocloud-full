@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import uuid
 import time
+import re
 
 # --- CONFIGURACIÓN: Ruteo estricto para 3 Agentes Especializados ---
 URLS_TO_SCRAPE = [
@@ -30,24 +31,38 @@ URLS_TO_SCRAPE = [
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 150 
 
+
+
 def clean_text(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
-    for element in soup(["script", "style", "nav", "footer", "header", "button", "svg", "form"]):
+    
+    # 1. Eliminar etiquetas de ruido visual y estructural
+    for element in soup(["script", "style", "nav", "footer", "header", "button", "svg", "form", "aside"]):
         element.extract()
+        
     text = soup.get_text(separator=' ')
-    lines = (line.strip() for line in text.splitlines())
-    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    text = '\n'.join(chunk for chunk in chunks if chunk)
+    
+    # 2. BLOQUEO DE COOKIES: Cortar todo el texto basura del aviso legal
+    if "Gestionar consentimiento" in text:
+        text = text.split("Gestionar consentimiento")[0]
+        
+    # 3. Limpiar espacios en blanco, saltos de línea y tabulaciones excesivas
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
 def chunk_text(text, chunk_size, overlap):
+    # 4. CHUNKING INTELIGENTE: Cortar por PALABRAS enteras, no por caracteres.
+    words = text.split()
     chunks = []
     start = 0
-    text_length = len(text)
-    while start < text_length:
+    
+    while start < len(words):
         end = start + chunk_size
-        chunks.append(text[start:end])
-        start = end - overlap
+        # Unimos las palabras completas para armar el fragmento
+        chunk = " ".join(words[start:end])
+        chunks.append(chunk)
+        start += (chunk_size - overlap)
+        
     return chunks
 
 def main():
@@ -94,7 +109,7 @@ def main():
         except Exception as e:
             print(f"  ❌ Error inesperado: {e}")
 
-    output_file = "rag_knowledge_base.json"
+    output_file = "backend/web_scrap/rag_knowledge_base.json"
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(knowledge_base, f, ensure_ascii=False, indent=2)
         

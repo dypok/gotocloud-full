@@ -30,5 +30,4 @@ class Settings(BaseSettings):
         populate_by_name=True,
     )
 
-
 settings = Settings()

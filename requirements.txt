@@ -8,3 +8,8 @@ python-dotenv==1.1.0
 httpx==0.28.1
 beautifulsoup4==4.14.3
 requests==2.34.2
+# --- Base de Datos y ORM ---
+sqlmodel
+alembic
+psycopg2-binary
+pgvector

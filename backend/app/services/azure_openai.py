@@ -39,3 +39,21 @@ class AzureOpenAIService:
             input=text,
         )
         return response.data[0].embedding
+    
+
+    # --- NUEVA FUNCIÓN AGREGADA PARA LA FASE 2 (Frank) ---
+    def get_embeddings(self, text: str) -> list[float]:
+        """
+        Toma un fragmento de texto (chunk) y lo convierte en un vector 
+        de 1536 dimensiones usando el deployment de Azure configurado.
+        """
+        try:
+            response = self.client.embeddings.create(
+                model=self.embeddings_deployment,
+                input=text
+            )
+            return response.data[0].embedding
+        except Exception as e:
+            # Puedes cambiar esto por tu logger.error más adelante si prefieres
+            print(f"Error generando embedding en AzureOpenAIService: {e}")
+            return []
