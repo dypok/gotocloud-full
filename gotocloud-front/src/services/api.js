@@ -1,47 +1,34 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const chatService = {
-    // Simular envío de mensaje (Mock mientras no hay backend)
-    sendMessage: async (sessionId, message) => {
-        // Cuando el back esté listo, descomentas esto:
-        /*
+    sendMessage: async (sessionId, message, channel = 'web_chat') => {
         const res = await fetch(`${API_BASE_URL}/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: sessionId, message })
+            body: JSON.stringify({
+                session_id: sessionId,
+                message,
+                channel
+            })
         });
+        if (!res.ok) throw new Error('Error del servidor');
         return res.json();
-        */
-
-        // MOCK (Para que sigas probando la UI):
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    response: `(Simulado) He recibido tu mensaje sobre: "${message}". Como Agent 1, buscaría en RAG.`,
-                });
-            }, 1000);
-        });
     }
 };
 
 export const dashboardService = {
     getMetrics: async () => {
-        // await fetch(`${API_BASE_URL}/dashboard/metrics`).then(res => res.json())
-
-        return new Promise((resolve) => {
-            setTimeout(() => resolve({
-                kpis: { active_incidents: 12, sla_risk: 1, sentiment: "Positivo", leads: 4 }
-            }), 500);
-        });
+        const res = await fetch(`${API_BASE_URL}/dashboard/metrics`);
+        if (!res.ok) throw new Error('Error obteniendo métricas');
+        return res.json();
     },
-
     queryIntelligenceAgent: async (query) => {
-        // POST a /api/intelligence/query
-        return new Promise((resolve) => {
-            setTimeout(() => resolve({
-                answer: `(Simulado) Tras analizar la BD, encontré esto respecto a "${query}".`,
-                type: 'general'
-            }), 1500);
+        const res = await fetch(`${API_BASE_URL}/intelligence/query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
         });
+        if (!res.ok) throw new Error('Error consultando agente');
+        return res.json();
     }
 };
