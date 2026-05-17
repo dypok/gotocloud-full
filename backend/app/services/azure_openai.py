@@ -1,6 +1,6 @@
 from openai import AzureOpenAI
 
-from app.core.config import settings
+from core.config import settings
 
 
 class AzureOpenAIService:
