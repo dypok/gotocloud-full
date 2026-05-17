@@ -2,6 +2,10 @@ from datetime import datetime
 from typing import Optional, List, Any
 from uuid import UUID, uuid4
 
+from datetime import datetime, UTC
+from typing import Optional
+from sqlmodel import Field
+
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, Text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -168,3 +172,12 @@ class Report(SQLModel, table=True):
     period_start: Optional[datetime] = Field(default=None)
     period_end: Optional[datetime] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+class ChatLog(SQLModel, table=True):
+    _tablename_ = "chat_logs"
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_message: str
+    bot_response: str
+    lead_score: int = Field(default=0)  
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
