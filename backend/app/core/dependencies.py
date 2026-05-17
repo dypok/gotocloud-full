@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.services.azure_openai import AzureOpenAIService
 from app.services.chat_orchestrator import ChatOrchestrator
 from app.services.redis_service import RedisService
+from app.services.tool_service import ToolService
 
 engine = create_engine(settings.postgres_url, echo=False)
 
@@ -26,7 +27,18 @@ def get_azure_openai_service() -> AzureOpenAIService:
     return AzureOpenAIService()
 
 
+def get_tool_service(
+    db: Session = Depends(get_db),
+    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+) -> ToolService:
+    return ToolService(db=db, ai_service=azure_service)
+
+
 def get_chat_orchestrator(
     azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    tool_service: ToolService = Depends(get_tool_service),
 ) -> ChatOrchestrator:
-    return ChatOrchestrator(azure_openai_service=azure_service)
+    return ChatOrchestrator(
+        azure_openai_service=azure_service,
+        tool_service=tool_service,
+    )
