@@ -1,6 +1,4 @@
-// src/services/api.js
-
-const API_BASE_URL = 'http://localhost:8000/api'; // La URL por defecto de FastAPI
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const chatService = {
     // Simular envío de mensaje (Mock mientras no hay backend)

@@ -187,7 +187,7 @@ export default function CustomerPortal() {
 
         try {
             const data = await chatService.sendMessage(sessionId, userText, savedGlobalPhone);
-            const agentMsg = { id: Date.now().toString(), role: 'agent', content: data.response };
+            const agentMsg = { id: Date.now().toString(), role: 'agent', content: data.reply }
             setMessages((prev) => [...prev, agentMsg]);
         } catch (error) {
             const errorMsg = { id: Date.now().toString(), role: 'agent', content: "Error de conexión." };
