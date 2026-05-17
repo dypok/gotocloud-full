@@ -198,7 +198,8 @@ project/
 ### Prerrequisitos
 
 - Python 3.11+
-- Node.js 18+
+- Node.js
+- React.js
 - Docker y Docker Compose
 - Suscripción Azure con los siguientes recursos provisionados:
   - Azure OpenAI (GPT-4o + GPT-4o-mini + text-embedding-ada-002)
