@@ -1,16 +1,16 @@
 from app.agents.customer_agent import CustomerAgent
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 from app.services.tool_service import ToolService
 
 
 class ChatOrchestrator:
     def __init__(
         self,
-        azure_openai_service: AzureOpenAIService,
+        gemini_service: GeminiService,
         tool_service: ToolService,
     ):
         self.customer_agent = CustomerAgent(
-            azure_openai_service=azure_openai_service,
+            gemini_service=gemini_service,
             tool_service=tool_service,
         )
 

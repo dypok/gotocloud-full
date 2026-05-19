@@ -1,15 +1,15 @@
 from app.prompts.customer_agent_prompt import SYSTEM_PROMPT, VOICE_PROMPT
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 from app.services.tool_service import ToolService
 
 
 class CustomerAgent:
     def __init__(
         self,
-        azure_openai_service: AzureOpenAIService,
+        gemini_service: GeminiService,
         tool_service: ToolService,
     ):
-        self.azure_openai_service = azure_openai_service
+        self.gemini_service = gemini_service
         self.tool_service = tool_service
 
     def build_messages(
@@ -108,4 +108,4 @@ class CustomerAgent:
             conversation_summary=conversation_summary,
             lead_info=lead_info,
         )
-        return self.azure_openai_service.chat(messages=messages)
+        return self.gemini_service.chat(messages=messages)

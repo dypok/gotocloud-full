@@ -5,7 +5,7 @@ from sqlmodel import Session, create_engine
 
 from app.core.config import settings
 from app.memory.memory_store import MemoryStore
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 from app.services.chat_orchestrator import ChatOrchestrator
 from app.services.redis_service import RedisService
 from app.services.tool_service import ToolService
@@ -30,22 +30,22 @@ def get_memory_store(
 
 
 @lru_cache
-def get_azure_openai_service() -> AzureOpenAIService:
-    return AzureOpenAIService()
+def get_gemini_service() -> GeminiService:
+    return GeminiService()
 
 
 def get_tool_service(
     db: Session = Depends(get_db),
-    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    gemini_service: GeminiService = Depends(get_gemini_service),
 ) -> ToolService:
-    return ToolService(db=db, ai_service=azure_service)
+    return ToolService(db=db, ai_service=gemini_service)
 
 
 def get_chat_orchestrator(
-    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    gemini_service: GeminiService = Depends(get_gemini_service),
     tool_service: ToolService = Depends(get_tool_service),
 ) -> ChatOrchestrator:
     return ChatOrchestrator(
-        azure_openai_service=azure_service,
+        gemini_service=gemini_service,
         tool_service=tool_service,
     )

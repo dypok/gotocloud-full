@@ -4,11 +4,11 @@ from uuid import UUID
 from sqlmodel import Session, select
 
 from app.models.schemas import VectorDocument, LeadOpportunity, Session as SessionModel, PGVECTOR_AVAILABLE
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 
 
 class ToolService:
-    def __init__(self, db: Session, ai_service: AzureOpenAIService):
+    def __init__(self, db: Session, ai_service: GeminiService):
         self.db = db
         self.ai_service = ai_service
 
@@ -21,7 +21,8 @@ class ToolService:
         if not vector_query:
             return []
 
-        if PGVECTOR_AVAILABLE and len(vector_query) == 3072:
+        # Update dimension check for Gemini (768)
+        if PGVECTOR_AVAILABLE and len(vector_query) == 768:
             stmt = (
                 select(VectorDocument)
                 .order_by(VectorDocument.embedding.cosine_distance(vector_query))

@@ -78,7 +78,7 @@ if PGVECTOR_AVAILABLE:
             default_factory=dict,
             sa_column=Column("metadata", JSONB),
         )
-        embedding: Any = Field(sa_column=Column(Vector(3072)))
+        embedding: Any = Field(sa_column=Column(Vector(768))) # Gemini text-embedding-004
 else:
     class VectorDocument(SQLModel, table=True):
         __tablename__ = "vector_documents"
@@ -174,7 +174,7 @@ class Report(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
 
 class ChatLog(SQLModel, table=True):
-    _tablename_ = "chat_logs"
+    __tablename__ = "chat_logs"
     
     id: Optional[int] = Field(default=None, primary_key=True)
     user_message: str

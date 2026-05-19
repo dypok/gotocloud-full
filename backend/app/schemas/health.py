@@ -6,4 +6,4 @@ class HealthResponse(BaseModel):
     app_name: str
     environment: str
     redis: bool
-    azure_openai: bool
+    gemini: bool

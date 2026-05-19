@@ -16,12 +16,16 @@ class Settings(BaseSettings):
     postgres_url: str = Field(alias="POSTGRES_URL")
     redis_url: str = Field(alias="REDIS_URL")
 
-    azure_openai_endpoint: str = Field(default="", alias="AZURE_OPENAI_ENDPOINT")
-    azure_openai_api_key: str = Field(default="", alias="AZURE_OPENAI_API_KEY")
-    azure_openai_api_version: str = Field(default="", alias="AZURE_OPENAI_API_VERSION")
-    azure_openai_deployment_gpt4o: str = Field(default="", alias="AZURE_OPENAI_DEPLOYMENT_GPT4O")
-    azure_openai_deployment_mini: str = Field(default="", alias="AZURE_OPENAI_DEPLOYMENT_MINI")
-    azure_openai_embeddings: str = Field(default="text-embedding-3-large", alias="AZURE_OPENAI_EMBEDDINGS")
+    # Gemini settings
+    gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
+    gemini_model: str = Field(default="gemini-1.5-flash", alias="GEMINI_MODEL")
+    gemini_embeddings_model: str = Field(default="text-embedding-004", alias="GEMINI_EMBEDDINGS_MODEL")
+
+    # Twilio settings
+    twilio_account_sid: str = Field(default="", alias="TWILIO_ACCOUNT_SID")
+    twilio_auth_token: str = Field(default="", alias="TWILIO_AUTH_TOKEN")
+    twilio_phone_number: str = Field(default="", alias="TWILIO_PHONE_NUMBER")
+    twilio_whatsapp_number: str = Field(default="", alias="TWILIO_WHATSAPP_NUMBER")
 
     session_ttl_hours: int = Field(default=24, alias="SESSION_TTL_HOURS")
     redis_context_ttl_minutes: int = Field(default=60, alias="REDIS_CONTEXT_TTL_MINUTES")
