@@ -11,9 +11,9 @@ from sqlmodel import Session as DBSession
 from app.analytics.aggregator import AnalyticsAggregator
 from app.agents.intelligence_agent import IntelligenceAgent
 from app.core.config import settings
-from app.core.dependencies import get_db, get_azure_openai_service
+from app.core.dependencies import get_db, get_gemini_service
 from app.models.schemas import Insight
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -193,7 +193,7 @@ def get_dashboard_metrics(
 def intelligence_query(
     body: IntelligenceQueryRequest,
     db: DBSession = Depends(get_db),
-    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    gemini_service: GeminiService = Depends(get_gemini_service),
     _: AdminUser = Depends(get_current_admin),
 ):
     """
@@ -202,7 +202,7 @@ def intelligence_query(
     y los pasa al IntelligenceAgent para generar insights ejecutivos.
     """
     agg = AnalyticsAggregator(db=db)
-    agent = IntelligenceAgent(azure_service=azure_service)
+    agent = IntelligenceAgent(gemini_service=gemini_service)
 
     # Construir payload combinado para el agente
     try:
@@ -233,7 +233,6 @@ def intelligence_query(
     else:
         # Query libre: enriquecer con contexto y dejar que el agente interprete
         messages = [
-            {"role": "system", "content": agent.system_prompt},
             {
                 "role": "user",
                 "content": (
@@ -245,7 +244,7 @@ def intelligence_query(
                 ),
             },
         ]
-        answer = azure_service.chat(messages)
+        answer = gemini_service.chat(messages)
 
     return IntelligenceQueryResponse(answer=answer)
 

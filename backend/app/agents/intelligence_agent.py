@@ -34,3 +34,15 @@ class IntelligenceAgent:
         messages = [{"role": "user", "content": prompt}]
         response = self.gemini_service.chat(messages=messages)
         return response # Simplified for now
+
+    def summarize_commercial_analytics(self, payload: Dict) -> str:
+        prompt = f"Analyze the following commercial data and provide a concise summary of leads and opportunities:\n{payload}"
+        return self.gemini_service.chat([{"role": "user", "content": prompt}])
+
+    def summarize_operational_analytics(self, payload: Dict) -> str:
+        prompt = f"Analyze the following operational data and provide a concise summary of session volumes and resolution rates:\n{payload}"
+        return self.gemini_service.chat([{"role": "user", "content": prompt}])
+
+    def generate_insights(self, payload: Dict) -> str:
+        prompt = f"Based on the following data, generate 3 high-level strategic insights for the business:\n{payload}"
+        return self.gemini_service.chat([{"role": "user", "content": prompt}])

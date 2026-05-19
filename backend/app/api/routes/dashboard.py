@@ -3,9 +3,9 @@ from sqlmodel import Session as DBSession
 
 from app.agents.intelligence_agent import IntelligenceAgent
 from app.analytics.aggregator import AnalyticsAggregator
-from app.core.dependencies import get_azure_openai_service, get_db
+from app.core.dependencies import get_gemini_service, get_db
 from app.models.schemas import Report
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -43,25 +43,24 @@ def get_metrics(db: DBSession = Depends(get_db)):
 def query_intelligence(
     payload: IntelligenceQuery,
     db: DBSession = Depends(get_db),
-    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    gemini_service: GeminiService = Depends(get_gemini_service),
 ):
     aggregator = AnalyticsAggregator(db=db)
     summary = aggregator.get_full_summary(hours=24)
 
-    agent = IntelligenceAgent(azure_service=azure_service)
+    agent = IntelligenceAgent(gemini_service=gemini_service)
 
     messages = [
-        {"role": "system", "content": agent.system_prompt},
         {
             "role": "user",
             "content": (
-                f"Analytics context:\n{summary}\n\n"
-                f"User question: {payload.query}\n\n"
-                "Answer concisely and in the same language as the question."
+                f"Usa este contexto de analíticas:\n{summary}\n\n"
+                f"Responde a esta pregunta: {payload.query}\n\n"
+                "Sé conciso y responde en el mismo idioma de la pregunta."
             ),
         },
     ]
-    answer = azure_service.chat(messages=messages)
+    answer = gemini_service.chat(messages=messages)
 
     return {"answer": answer, "type": "intelligence"}
 
@@ -69,13 +68,14 @@ def query_intelligence(
 @router.post("/reports/generate")
 def generate_report(
     db: DBSession = Depends(get_db),
-    azure_service: AzureOpenAIService = Depends(get_azure_openai_service),
+    gemini_service: GeminiService = Depends(get_gemini_service),
 ):
     aggregator = AnalyticsAggregator(db=db)
     summary = aggregator.get_full_summary(hours=24)
 
-    agent = IntelligenceAgent(azure_service=azure_service)
-    content = agent.generate_insights(summary)
+    agent = IntelligenceAgent(gemini_service=gemini_service)
+    # IntelligenceAgent has generate_report method
+    content = agent.generate_report(summary)
 
     report = Report(
         report_type="operational",
