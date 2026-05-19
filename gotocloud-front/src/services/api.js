@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://gotocloud-full-2fuv.onrender.com/';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gotocloud-full-2fuv.onrender.com';
 
 export const chatService = {
   sendMessage: async (sessionId, message, channel = 'webchat') => {
