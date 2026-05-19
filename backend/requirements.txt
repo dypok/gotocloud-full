@@ -9,6 +9,7 @@ redis
 python-dotenv
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==3.2.0
 python-multipart
 google-generativeai
 httpx
