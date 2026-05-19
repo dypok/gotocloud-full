@@ -17,6 +17,12 @@ export const chatService = {
     }
     return res.json();
   },
+
+  getContext: async (phoneNumber, channel = 'webchat') => {
+    const res = await fetch(`${API_BASE_URL}/chat/context?phone_number=${encodeURIComponent(phoneNumber)}&channel=${channel}`);
+    if (!res.ok) return null;
+    return res.json();
+  },
 };
 
 export const dashboardService = {
@@ -35,13 +41,13 @@ export const dashboardService = {
           session_volume: 24, conversation_volume: 87,
           incident_volume: 12, active_incidents: 3, resolved_incidents: 9,
           channel_breakdown: { webchat: 14, voice: 6, whatsapp: 4 },
-          emerging_topics: ['azure', 'migration', 'security', 'pricing', 'demo'],
+          emerging_topics: ['gemini', 'migration', 'security', 'pricing', 'demo'],
           resolution_rate: 75.0, sla_risk: 1,
         },
         commercial: {
-          signals: { azure_migration_mentions: 8, security_mentions: 5, pricing_demo_mentions: 6, enterprise_mentions: 4 },
+          signals: { cloud_migration_mentions: 8, security_mentions: 5, pricing_demo_mentions: 6, enterprise_mentions: 4 },
           estimated_lead_score: 145, opportunity_trend: 'high',
-          service_demand_summary: { azure_modernization: 8, security: 5, data_ai: 3, infrastructure: 4 }
+          service_demand_summary: { cloud_modernization: 8, security: 5, data_ai: 3, infrastructure: 4 }
         }
       };
     }

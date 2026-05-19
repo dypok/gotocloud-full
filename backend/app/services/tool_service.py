@@ -80,7 +80,7 @@ class ToolService:
             return None
 
         interest_areas = {
-            "azure": "Azure",
+            "gemini": "Cloud",
             "seguridad": "Security",
             "cloud": "Cloud",
             "datos": "Data",

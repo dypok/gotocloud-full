@@ -73,7 +73,7 @@ class AnalyticsAggregator:
         conversations = self._get_recent_conversations(hours=hours)
 
         signals = {
-            "azure_migration_mentions": 0,
+            "cloud_migration_mentions": 0,
             "security_mentions": 0,
             "pricing_demo_mentions": 0,
             "enterprise_mentions": 0,
@@ -90,8 +90,8 @@ class AnalyticsAggregator:
             if session_id:
                 session_message_counter[session_id] += 1
 
-            if "azure" in text and any(word in text for word in ["migration", "migrate", "modernization", "cloud"]):
-                signals["azure_migration_mentions"] += 1
+            if any(word in text for word in ["gemini", "cloud"]) and any(word in text for word in ["migration", "migrate", "modernization"]):
+                signals["cloud_migration_mentions"] += 1
                 if session_id:
                     opportunity_sessions.add(session_id)
 
@@ -118,7 +118,7 @@ class AnalyticsAggregator:
         opportunity_sessions.update(multi_conversation_sessions)
 
         lead_score = (
-            signals["azure_migration_mentions"] * 30
+            signals["cloud_migration_mentions"] * 30
             + signals["security_mentions"] * 20
             + signals["enterprise_mentions"] * 25
             + signals["multiple_conversations_sessions"] * 15
@@ -144,7 +144,7 @@ class AnalyticsAggregator:
     def _extract_emerging_topics(self, conversations: list[Conversation]) -> list[str]:
         keywords = []
         tracked_terms = [
-            "azure",
+            "gemini",
             "migration",
             "vm",
             "security",
@@ -171,7 +171,7 @@ class AnalyticsAggregator:
 
     def _extract_service_demand(self, conversations: list[Conversation]) -> dict:
         service_map = {
-            "azure_modernization": ["azure", "migration", "cloud", "modernization"],
+            "cloud_modernization": ["gemini", "migration", "cloud", "modernization"],
             "security": ["security", "mfa", "casb", "zero trust", "identity"],
             "data_ai": ["data", "ai", "analytics", "copilot", "ml"],
             "infrastructure": ["vm", "server", "network", "infra", "hosting"],

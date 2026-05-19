@@ -38,12 +38,12 @@ CREATE TABLE IF NOT EXISTS incidents (
 CREATE INDEX idx_incidents_session_id ON incidents(session_id);
 
 -- 4. VECTOR DOCUMENTS (RAG)
--- Using 768 dimensions for Google Gemini text-embedding-004
+-- Using 3072 dimensions for Google Gemini gemini-embedding-001
 CREATE TABLE IF NOT EXISTS vector_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     content TEXT NOT NULL,
     metadata JSONB DEFAULT '{}',
-    embedding vector(768)
+    embedding vector(3072)
 );
 
 -- 5. LEAD OPPORTUNITIES

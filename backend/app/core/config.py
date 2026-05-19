@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     # Gemini settings
     gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
     gemini_model: str = Field(default="gemini-1.5-flash", alias="GEMINI_MODEL")
-    gemini_embeddings_model: str = Field(default="text-embedding-004", alias="GEMINI_EMBEDDINGS_MODEL")
+    gemini_embeddings_model: str = Field(default="gemini-embedding-001", alias="GEMINI_EMBEDDINGS_MODEL")
 
     # Twilio settings
     twilio_account_sid: str = Field(default="", alias="TWILIO_ACCOUNT_SID")

@@ -11,16 +11,16 @@ from sqlmodel import Session, select, create_engine
 
 from app.core.config import settings
 from app.models.schemas import VectorDocument
-from app.services.azure_openai import AzureOpenAIService
+from app.services.gemini_service import GeminiService
 
 
 engine = create_engine(settings.postgres_url)
-ai_service = AzureOpenAIService()
+ai_service = GeminiService()
 
 
 def buscar_contexto(pregunta: str, limite: int = 3) -> str:
     """Convierte la pregunta a vector y busca los fragmentos más relevantes."""
-    vector_pregunta = ai_service.embed_text(pregunta)
+    vector_pregunta = ai_service.get_embeddings(pregunta)
 
     if not vector_pregunta:
         return ""
@@ -49,22 +49,22 @@ def chat_rag():
         contexto = buscar_contexto(pregunta)
 
         if not contexto:
-            print("   ⚠️ Sin contexto. Revisa que vector_documents tenga datos y las llaves de Azure.")
+            print("   ⚠️ Sin contexto. Revisa que vector_documents tenga datos y la API Key de Gemini.")
             continue
 
-        print("   🧠 2. Generando respuesta con Azure GPT-4o...")
+        print("   🧠 2. Generando respuesta con Gemini...")
 
         mensajes = [
             {
-                "role": "system",
+                "role": "user",
                 "content": (
                     "Eres un agente experto de soporte técnico y comercial de GoToCloud. "
                     "Responde la pregunta del usuario de forma profesional y clara basándote ÚNICAMENTE en el siguiente contexto.\n\n"
                     f"CONTEXTO DE LA BASE DE DATOS:\n{contexto}\n\n"
+                    f"Pregunta del usuario: {pregunta}\n\n"
                     "Si la respuesta no está en el contexto, indica amablemente que no tienes esa información y ofrece que contacten a un asesor humano."
                 )
-            },
-            {"role": "user", "content": pregunta}
+            }
         ]
 
         try:

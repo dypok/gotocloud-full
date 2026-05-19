@@ -14,8 +14,8 @@ const TRANSLATIONS = {
         btnRegister: "Iniciar Asistencia",
         placeholderPhone: "300 123 4567",
         channelWeb: "Soporte Web",
-        azureActive: "Nodo Azure Operativo",
-        aiBanner: "🛡️ Comunicación protegida por el Agente Autónomo de GoToCloud",
+        geminiActive: "Nodo Gemini Operativo",
+        aiBanner: "🛡️ Comunicación protegida por la IA de GoToCloud",
         placeholderChat: "Escribe tu consulta aquí...",
         btnVoice: "Llamada de Voz",
         btnTelegram: "Continuar en Telegram",
@@ -27,8 +27,8 @@ const TRANSLATIONS = {
         callSpeaking: "AGENTE RESPONDIENDO...",
         callMuted: "MICRÓFONO SILENCIADO",
         wsSuccess: "Transición exitosa. Redirigiendo a Telegram...",
-        welcomeNew: "Hola, te doy la bienvenida a GoToCloud. Soy tu agente de Inteligencia Artificial. ¿En qué te puedo asesorar hoy sobre nuestra infraestructura cloud?",
-        welcomeReturning: "¡Qué bueno verte de nuevo! He recuperado nuestro contexto anterior. ¿En qué más te puedo ayudar hoy con tu entorno Azure?",
+        welcomeNew: "Hola, te doy la bienvenida a GoToCloud. Soy tu asistente de Inteligencia Artificial. ¿En qué te puedo asesorar hoy sobre nuestra infraestructura cloud?",
+        welcomeReturning: "¡Qué bueno verte de nuevo! He recuperado nuestro historial. ¿En qué más te puedo ayudar hoy con tu infraestructura?",
         voiceNotSupported: "Tu navegador no soporta reconocimiento de voz. Usa Chrome.",
         callEnded: "📞 Llamada finalizada.",
     },
@@ -39,8 +39,8 @@ const TRANSLATIONS = {
         btnRegister: "Iniciar Atendimento",
         placeholderPhone: "(11) 91234-5678",
         channelWeb: "Suporte Web",
-        azureActive: "Nodo Azure Operacional",
-        aiBanner: "🛡️ Comunicação protegida pelo Agente Autônomo da GoToCloud",
+        geminiActive: "Nodo Gemini Operacional",
+        aiBanner: "🛡️ Comunicação protegida pela IA da GoToCloud",
         placeholderChat: "Digite sua dúvida aqui...",
         btnVoice: "Chamada de Voz",
         btnTelegram: "Continuar no Telegram",
@@ -52,8 +52,8 @@ const TRANSLATIONS = {
         callSpeaking: "AGENTE RESPONDENDO...",
         callMuted: "MICROFONE MUDO",
         wsSuccess: "Transição concluída. Redirecionando para o Telegram...",
-        welcomeNew: "Olá, boas-vindas à GoToCloud. Sou seu agente de Inteligência Artificial. Como posso te apoiar hoje com nossa infraestrutura em nuvem?",
-        welcomeReturning: "Que bom te ver de novo! Recuperei o nosso contexto anterior. Como mais posso te ajudar hoje com seu ambiente Azure?",
+        welcomeNew: "Olá, boas-vindas à GoToCloud. Sou seu assistente de Inteligência Artificial. Como posso te apoiar hoje com nossa infraestrutura em nuvem?",
+        welcomeReturning: "Que bom te ver de novo! Recuperei o nosso histórico. Como mais posso te ajudar hoje com sua infraestrutura?",
         voiceNotSupported: "Seu navegador não suporta reconhecimento de voz. Use o Chrome.",
         callEnded: "📞 Chamada encerrada.",
     },
@@ -64,8 +64,8 @@ const TRANSLATIONS = {
         btnRegister: "Start Assistance",
         placeholderPhone: "202-555-0143",
         channelWeb: "Web Support",
-        azureActive: "Azure Node Operational",
-        aiBanner: "🛡️ Communication secured by GoToCloud's Autonomous Agent",
+        geminiActive: "Gemini Node Operational",
+        aiBanner: "🛡️ Communication secured by GoToCloud's AI",
         placeholderChat: "Type your question here...",
         btnVoice: "Voice Call",
         btnTelegram: "Continue on Telegram",
@@ -77,8 +77,8 @@ const TRANSLATIONS = {
         callSpeaking: "AGENT RESPONDING...",
         callMuted: "MICROPHONE MUTED",
         wsSuccess: "Transition successful. Redirecting to Telegram...",
-        welcomeNew: "Hello, welcome to GoToCloud. I'm your AI agent. How can I assist you today with our cloud infrastructure?",
-        welcomeReturning: "Great to see you again! I've recovered our previous context. How else can I help you today with your Azure environment?",
+        welcomeNew: "Hello, welcome to GoToCloud. I'm your AI assistant. How can I assist you today with our cloud infrastructure?",
+        welcomeReturning: "Great to see you again! I've recovered our history. How else can I help you today with your infrastructure?",
         voiceNotSupported: "Your browser doesn't support voice recognition. Please use Chrome.",
         callEnded: "📞 Call ended.",
     }
@@ -312,16 +312,37 @@ export default function CustomerPortal() {
         }
     };
 
-    const handleLinkIdentity = (e) => {
+    const handleLinkIdentity = async (e) => {
         e.preventDefault();
         const cleanDigits = localNumber.replace(/\D/g, '');
         if (!cleanDigits || cleanDigits.length < 6) return;
         const callingCode = getCountryCallingCode(activeCountry);
         const fullPhoneNumber = `+${callingCode}${cleanDigits}`;
+        
         localStorage.setItem('global_phone_number', fullPhoneNumber);
         setSavedGlobalPhone(fullPhoneNumber);
         setIsIdentityLinked(true);
-        setMessages([{ id: '1', role: 'agent', content: t.welcomeNew }]);
+        setIsLoading(true);
+
+        try {
+            const context = await chatService.getContext(fullPhoneNumber, 'webchat');
+            if (context && context.messages && context.messages.length > 0) {
+                // Si hay historial, mostrar bienvenida de retorno y cargar últimos mensajes
+                const history = context.messages.map(m => ({
+                    id: Math.random().toString(),
+                    role: m.role,
+                    content: m.message || m.content
+                }));
+                setMessages([...history, { id: 'welcome', role: 'agent', content: t.welcomeReturning }]);
+            } else {
+                setMessages([{ id: 'welcome', role: 'agent', content: t.welcomeNew }]);
+            }
+        } catch (error) {
+            console.error("Error fetching context:", error);
+            setMessages([{ id: 'welcome', role: 'agent', content: t.welcomeNew }]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // --- LÓGICA DE REDIRECCIÓN A TELEGRAM ---
@@ -448,7 +469,7 @@ export default function CustomerPortal() {
                         </div>
                         <span className="flex items-center gap-1.5 text-[10px] md:text-xs text-zinc-400 bg-zinc-900 px-2 py-1 rounded-md border border-zinc-800">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            {t.azureActive}
+                            {t.geminiActive}
                         </span>
                     </header>
 

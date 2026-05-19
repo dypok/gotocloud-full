@@ -96,6 +96,7 @@ def main():
 
             except Exception as e:
                 print(f"   ❌ Error en chunk {i+1}: {e}")
+                db_session.rollback()
                 errors += 1
                 continue
 

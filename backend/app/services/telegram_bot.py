@@ -65,17 +65,17 @@ async def responder_mensaje(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 2. Buscar contexto en PostgreSQL (tu RAG)
         contexto = buscar_contexto(pregunta)
 
-        # 3. Armar los mensajes para Azure GPT-4o
+        # 3. Armar los mensajes para Gemini
         mensajes = [
             {
-                "role": "system",
+                "role": "user",
                 "content": (
                     "Eres un agente experto de soporte técnico y comercial de GoToCloud. "
                     "Responde de forma concisa, amigable y usando emojis basándote ÚNICAMENTE en el siguiente contexto:\n"
-                    f"{contexto}\n"
+                    f"{contexto}\n\n"
+                    f"Pregunta del usuario: {pregunta}"
                 )
-            },
-            {"role": "user", "content": pregunta}
+            }
         ]
 
         # 4. Generar la respuesta usando la IA de tu equipo

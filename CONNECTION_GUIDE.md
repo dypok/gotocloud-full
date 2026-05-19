@@ -83,7 +83,7 @@ Hemos implementado un sistema de memoria basado en el número de teléfono para 
 Permite hacer preguntas complejas sobre los datos acumulados.
 
 - **Endpoint**: `POST /api/admin/intelligence/query`
-- **Payload**: `{"query": "¿Cuál es la tendencia de incidentes en Azure?"}`
+- **Payload**: `{"query": "¿Cuál es la tendencia de incidentes en la nube?"}`
 
 ---
 
